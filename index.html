@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <link rel="stylesheet" href="css/normal.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="lib/jquery/jquery.js"></script>
+</head>
+
+<body>
+    <!-- 头部 -->
+    <header>
+        <!-- 这里放选项卡 -->
+        <div class="header-nav-tab">
+            <i class="btn-menu"></i>
+            <div class="nav-list">
+                <div class="nav-tab">
+                    <div class="nav-tab-item actived" data-href='index.html'>
+                        <div class="triangle triangle-l"></div>
+                        <span class="title">首页</span>
+                        <div class="triangle triangle-r"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- 这里是页面 -->
+    <div class="body main-iframes">
+        <div class="iframe-item iframe-show" data-href='index.html'>
+            <iframe id="iframebox1" class="framebox" name="framebox" src="function.html" frameborder="none"></iframe>
+        </div>
+    </div>
+    <!-- 右侧快速点击栏 -->
+    <div class="quick-box">
+        <div class="quick-box-inner">
+            <div class="title">
+                页面分类一
+            </div>
+            <div class="menulist-box">
+                <ul>
+                    <li>
+                        <a data-href="1.html">
+                            <span>页面一</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-href="2.html">
+                            <span>页面二</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-href="3.html">
+                            <span>页面三</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="title">
+                页面分类二
+            </div>
+            <div class="menulist-box">
+                <ul>
+                    <li>
+                        <a data-href="4.html">
+                            <span>页面四</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-href="5.html">
+                            <span>页面五</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-href="6.html">
+                            <span>页面六</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $('document').ready(function () {
+        $('.btn-menu').on('mouseenter', function () {
+            $('.quick-box').addClass('show')
+        })
+        $('.btn-menu').on('mouseleave', function () {
+            $('.quick-box').removeClass('show')
+        })
+        // nav标签点击事件
+        $('.nav-tab').on('click', '.nav-tab-item', function () {
+            $(this).addClass('actived').siblings().removeClass('actived');
+            var tabHref = $(this).attr('data-href');
+            $('.iframe-item').each(function (i, e) {
+                if (tabHref == $(e).attr('data-href')) {
+                    $(e).addClass('iframe-show').siblings().removeClass('iframe-show')
+                }
+            })
+        })
+        // nav标签点击关闭事件
+        $('.nav-tab').on('click', '.close-tab', function (e) {
+            e.stopPropagation()
+            var curTab = $(this).parent()
+            var curIndex = $(this).parent().index();
+            var curhref = $(this).parent().attr('data-href')
+            var curIframe = $(".iframe-item[data-href='" + curhref + "']")
+            var isThis = curTab.hasClass('actived') //判断删除的是否是当前项
+            if (isThis) {
+                //删除的是当前选中项  给下一项设置选中状态
+                var nextTab = curTab.next()
+                var nextIframe = curIframe.next()
+                if (nextTab[0]) {
+                    // 下一项存在
+                    $(nextTab[0]).addClass('actived')
+                    $(nextIframe[0]).addClass('iframe-show')
+                } else {
+                    //下一项不存在
+                    // 由于首页不可删除，所以始终存在前一项
+                    var prevTab = curTab.prev()
+                    var prevIframe = curIframe.prev()
+                    $(prevTab[0]).addClass('actived')
+                    $(prevIframe[0]).addClass('iframe-show')
+                }
+            }
+            // 删除tab和iframe
+            curTab.remove()
+            curIframe.remove()
+        })
+    })
+    // 左边quick-box
+    $('*[data-href]').on('click', function () {
+        var titleName = $(this).text().replace(/[\r\n]/g, "").replace(/\ +/g, "");//选项卡名称
+        var href = $(this).attr('data-href')
+        if (!isExist(href)) {
+            addTab(titleName, href);
+            addIframe(href)
+        } else {
+            var tabThis = $(".nav-tab-item[data-href='" + href + "']")
+            var iframeThis = $(".iframe-item[data-href='" + href + "']")
+            tabThis.addClass('actived').siblings().removeClass('actived')
+            iframeThis.addClass('iframe-show').siblings().removeClass('iframe-show')
+        }
+    })
+    // 添加选项卡
+    function addTab(titleName, href) {
+        var navtab = $('.nav-tab')
+        var navtabChild = `<div class="nav-tab-item actived" data-href=${href}>
+                            <div class="triangle triangle-l"></div>
+                            <span class="title">${titleName}</span>
+                            <div class="triangle triangle-r"></div>
+                            <i class="close-tab"></i>
+                        </div>`
+        navtab.children().removeClass('actived')
+        navtab.append(navtabChild)
+    }
+    // 添加iframe
+    function addIframe(href) {
+        var iframes = $('.main-iframes');
+        iframes.children().removeClass('iframe-show')
+        var iframesChild = `<div class="iframe-item iframe-show" data-href=${href}><iframe id="iframebox1" class="framebox" name="framebox" src="${href}" frameborder="none"></iframe></div>`
+        iframes.append(iframesChild);
+    }
+    // 判断是否存在
+    function isExist(href) {
+        var navtabitem = $('.nav-tab-item');
+        let navtabHrefs = []
+        navtabitem.each(function () {
+            navtabHrefs.push($(this).attr('data-href'))
+        })
+        return navtabHrefs.indexOf(href) > -1 //返回true 包含该元素
+    }
+</script>
+
+</html>

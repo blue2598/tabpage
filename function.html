@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选项页</title>
+    <link rel="stylesheet" href="css/normal.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="lib/jquery/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container" data-spy="scroll" data-target="#navbar" style="position: relative;">
+        <div class="center">
+            <div class="center-item" id="ymfl1">
+                <div class="title">页面分类一</div>
+                <div class="function-box">
+                    <ul>
+                        <li>
+                            <a data-href="1.html">
+                                <span>页面一</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a data-href="2.html">
+                                <span>页面二</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a data-href="3.html">
+                                <span>页面三</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="center-item" id="ymfl2">
+                <div class="title">页面分类二</div>
+                <div class="function-box">
+                    <ul>
+                        <li>
+                            <a data-href="4.html">
+                                <span>页面四</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a data-href="5.html">
+                                <span>页面五</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a data-href="6.html">
+                                <span>页面六</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="right-nav">
+            <div id="navbar">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a data-target="#ymfl1" aria-controls="ymfl1" role="tab" data-toggle="tab">页面分类一</a>
+                    </li>
+                    <li role="presentation">
+                        <a data-target="#ymfl2" aria-controls="ymfl2" role="tab" data-toggle="tab">页面分类二</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(document).ready(function () {
+        $('body').scrollspy({ target: '#navbar' })
+        //滚动监听
+        $('#navbar ul li a').click(function () {
+            $(this).parent().addClass('active')
+            $(this).parent().siblings().removeClass('active')
+            var fix = 82;
+            var attr = $(this).attr('data-target');
+            $("#navbar").css("position") == "relative";
+            $("html,body").animate({ scrollTop: $(attr).offset().top - fix });
+            return false;  //必须要
+        })
+    });
+    $('*[data-href]').on('click', function () {
+        var titleName = $(this).text().replace(/[\r\n]/g, "").replace(/\ +/g, "");//选项卡名称
+        var href = $(this).attr('data-href')
+        if (!isExist(href)) {
+            addTab(titleName, href);
+            addIframe(href)
+        } else {
+            var tabThis = window.parent.$(".nav-tab-item[data-href='" + href + "']")
+            var iframeThis = window.parent.$(".iframe-item[data-href='" + href + "']")
+            tabThis.addClass('actived').siblings().removeClass('actived')
+            iframeThis.addClass('iframe-show').siblings().removeClass('iframe-show')
+        }
+    })
+    // 添加选项卡
+    function addTab(titleName, href) {
+        var navtab = window.parent.$('.nav-tab')
+        var navtabChild = `<div class="nav-tab-item actived" data-href=${href}>
+                            <div class="triangle triangle-l"></div>
+                            <span class="title">${titleName}</span>
+                            <div class="triangle triangle-r"></div>
+                            <i class="close-tab"></i>
+                        </div>`
+        navtab.children().removeClass('actived')
+        navtab.append(navtabChild)
+    }
+    // 添加iframe
+    function addIframe(href) {
+        var iframes = window.parent.$('.main-iframes');
+        iframes.children().removeClass('iframe-show')
+        var iframesChild = `<div class="iframe-item iframe-show" data-href=${href}><iframe id="iframebox1" class="framebox" name="framebox" src="${href}" frameborder="none"></iframe></div>`
+        iframes.append(iframesChild);
+    }
+    // 判断是否存在
+    function isExist(href) {
+        var navtabitem = window.parent.$('.nav-tab-item');
+        let navtabHrefs = []
+        navtabitem.each(function () {
+            navtabHrefs.push($(this).attr('data-href'))
+        })
+        return navtabHrefs.indexOf(href) > -1 //返回true 包含该元素
+    }
+</script>
+
+</html>
